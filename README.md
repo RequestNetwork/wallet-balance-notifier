@@ -2,6 +2,9 @@
 
 Small utility to receive slack alerts when a given Ethereum wallet balance is low (under given threshold)
 
+![image](https://user-images.githubusercontent.com/14175665/62474023-4911d080-b7a2-11e9-9ea2-f5d51014e1f8.png)
+
+
 ## How to use
 
 1. Create a google [spreadsheet](https://sheets.new)
