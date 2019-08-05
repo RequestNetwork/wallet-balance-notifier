@@ -1,4 +1,4 @@
-# Ethereum Low Balance notifier
+# Ethereum Wallet Balance notifier
 
 Small utility to receive slack alerts when a given Ethereum wallet balance is low (under given threshold)
 
@@ -30,3 +30,18 @@ SPREADSHEET_ID=[your spreadhsheet id] node index.js
 
 - Configuration Spreadsheet is available [here](https://docs.google.com/spreadsheets/d/1JfS4McLLMrfHhIWZl3_caZCN_06WjhNjXticmvHaKE8/edit)
 - The function is deployed under [Google Cloud Functions](https://console.cloud.google.com/functions/list), and scheduled hourly using [Google Cloud Scheduler](https://console.cloud.google.com/cloudscheduler)
+
+### Push new version
+
+You must have gcloud configured.
+
+Configure your local repo (first time only)
+```
+git config --global credential.https://source.developers.google.com.helper gcloud.sh
+git remote add google https://source.developers.google.com/p/request-240714/r/wallet-balance-notifier
+```
+
+Push new version:
+```
+git push google master
+```
