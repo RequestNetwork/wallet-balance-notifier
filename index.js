@@ -52,8 +52,13 @@ const sendAlert = async (
             title: "Balance",
             value: `${balance} ETH`,
             short: true
-          }
-        ],
+          },
+	  {
+	    title: "Network",
+	    value: network,
+	    short: true
+	  }
+	],
         color: "danger"
       }
     ]
