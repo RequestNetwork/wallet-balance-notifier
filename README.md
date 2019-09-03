@@ -45,3 +45,5 @@ Push new version:
 ```
 git push google master
 ```
+
+** NB: the function will not automatically be updated, go to the web UI and click Edit > Deploy, this should update to the latest commit **
