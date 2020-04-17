@@ -104,4 +104,8 @@ export const main = async () => {
   for (const wallet of wallets) {
     await processWallet(wallet);
   }
+
+  if (process.env.HEALTHCHECK_URL) {
+    await axios.post(process.env.HEALTHCHECK_URL);
+  }
 };

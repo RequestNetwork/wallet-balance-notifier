@@ -170,7 +170,13 @@ exports.main = function () { return __awaiter(void 0, void 0, void 0, function (
             case 5:
                 _i++;
                 return [3 /*break*/, 3];
-            case 6: return [2 /*return*/];
+            case 6:
+                if (!process.env.HEALTHCHECK_URL) return [3 /*break*/, 8];
+                return [4 /*yield*/, axios_1.default.post(process.env.HEALTHCHECK_URL)];
+            case 7:
+                _a.sent();
+                _a.label = 8;
+            case 8: return [2 /*return*/];
         }
     });
 }); };
