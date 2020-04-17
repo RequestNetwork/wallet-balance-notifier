@@ -1,0 +1,39 @@
+name: "Deploy to Google Cloud Functions"
+
+on: 
+  push:
+    branches:
+      - master
+
+jobs:
+  build-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Use Node.js 10.x
+        uses: actions/setup-node@v1
+        with:
+          node-version: 10.x
+      - uses: GoogleCloudPlatform/github-actions/setup-gcloud@0.1.2
+        with:
+          version: '285.0.0'
+          project_id: ${{ secrets.GCP_PROJECT_ID }}
+          service_account_email: ${{ secrets.GCP_SA_EMAIL }}
+          service_account_key: ${{ secrets.GCP_SA_KEY }}
+          export_default_credentials: true
+      - name: Build
+        run: | 
+          yarn
+          yarn build
+      - name: Prepare function 
+        run: |
+          mkdir function
+          cp $(pwd)/dist/index.js function
+          cp $(pwd)/package.json function
+      - name: Deploy
+        run: |
+          gcloud functions deploy sync-wallet-balance \
+            --source ./function \
+            --runtime nodejs8 \
+            --trigger-topic sync-wallet-balance \
+            --entry-point main

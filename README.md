@@ -16,7 +16,7 @@ Small utility to receive slack alerts when a given Ethereum wallet balance is lo
 | Address    | The ethereum address you want to monitor                                               |
 | Threshold  | The threshold, in ETH, under which the alert will be sent                              |
 | Network    | Mainnet or Rinkeby                                                                     |
-| Slack hook | A valid [slack hook](https://api.slack.com/incoming-webhooks) URL to send the alert to |
+| SlackHook  | A valid [slack hook](https://api.slack.com/incoming-webhooks) URL to send the alert to |
 
 3. Fill some data
 4. Get the spreadsheet ID (available in url after https://docs.google.com/spreadsheets/)
@@ -33,17 +33,4 @@ SPREADSHEET_ID=[your spreadhsheet id] node index.js
 
 ### Push new version
 
-You must have gcloud configured.
-
-Configure your local repo (first time only)
-```
-git config --global credential.https://source.developers.google.com.helper gcloud.sh
-git remote add google https://source.developers.google.com/p/request-240714/r/wallet-balance-notifier
-```
-
-Push new version:
-```
-git push google master
-```
-
-** NB: the function will not automatically be updated, go to the web UI and click Edit > Deploy, this should update to the latest commit **
+Any commit to master will be automatically deployed.
