@@ -379,10 +379,10 @@ googleapis@^45.0.0:
     google-auth-library "^5.2.0"
     googleapis-common "^3.1.0"
 
-gsheet-object@0.1.2:
-  version "0.1.2"
-  resolved "https://registry.yarnpkg.com/gsheet-object/-/gsheet-object-0.1.2.tgz#eb311cd28cef52570f2d119fed0ee596d0f66c39"
-  integrity sha512-rDS/5+Z5BEtF0DJ9EFMe0uoTmi+AvfS3llEEB1TdUaJtmmyF/4GgyAgU6mxAX4JgG9V6HB8i1IJ5j9o1JOSxCw==
+gsheet-object@0.1.3:
+  version "0.1.3"
+  resolved "https://registry.yarnpkg.com/gsheet-object/-/gsheet-object-0.1.3.tgz#150de194d9e373ef411ef59dbd5926c5e6e54889"
+  integrity sha512-2HXYgMdi/a1Y2gqxyFE3umAsnwUC6t6lnob1V0tC1M1ZdB2GrPYYmQ3iFc/yLB0vW1z0bM8NMSgC2kq+MBDHRA==
   dependencies:
     debug "^4.1.1"
     dotenv "^8.2.0"
