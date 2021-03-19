@@ -8,17 +8,12 @@ interface IWalletAlertConfig {
   threshold: string;
   network: string;
   slackHook: string;
+  balance: string;
 }
 
 const sendAlert = async (
   text: any,
-  {
-    name,
-    address,
-    balance,
-    network,
-    slackHook,
-  }: IWalletAlertConfig & { balance: string }
+  { name, address, balance, network, slackHook }: IWalletAlertConfig
 ) => {
   const baseUrl =
     network.toLowerCase() === "rinkeby"
@@ -51,27 +46,33 @@ const sendAlert = async (
   });
 };
 
+const urls: Record<string, string> = {
+  rinkeby: "https://api-rinkeby.etherscan.io",
+  mainnet: "https://api.etherscan.io",
+  xdai: "https://blockscout.com/xdai/mainnet/api",
+};
+
 const getClient = (network: string) => {
-  const apiUrl =
-    network.toLowerCase() === "rinkeby"
-      ? "https://api-rinkeby.etherscan.io"
-      : "https://api.etherscan.io";
+  const baseURL = urls[network.toLowerCase()] || urls.mainnet;
   const client = axios.create({
-    baseURL: apiUrl,
+    baseURL,
+    params: baseURL.includes("etherscan")
+      ? { apiKey: process.env.ETHERSCAN_API_KEY }
+      : {},
   });
   return client;
 };
 
 const processWallet = async (wallet: IWalletAlertConfig) => {
-  const { name, address, threshold, network } = wallet;
+  const { name, address, threshold, network, balance: currentBalance } = wallet;
   const api = getClient(network);
-  const apikey = process.env.ETHERSCAN_API_KEY;
+  console.log(api.defaults.params);
   const response = await api.get("/api", {
     params: {
       module: "account",
       action: "balance",
       address,
-      apikey,
+      ...api.defaults.params,
     },
   });
 
@@ -79,22 +80,27 @@ const processWallet = async (wallet: IWalletAlertConfig) => {
     throw new Error(response.data.result);
   }
 
-  const balance = Number(
-    web3Utils.fromWei(response.data.result, "ether")
-  ).toFixed(3);
+  const newBalance = Number(web3Utils.fromWei(response.data.result, "ether"));
   console.log({
-    balance,
+    balance: newBalance,
     threshold,
   });
-  if (balance < threshold) {
-    console.error(`low balance on wallet ${name} (${address}): ${balance}`);
-    sendAlert(`:alert: Low balance on wallet ${name}`, {
-      ...wallet,
-      balance,
-    });
-  } else {
-    console.log(`balance on wallet ${name} (${address}): ${balance}`);
+  if (currentBalance && Number(currentBalance) === newBalance) {
+    return null;
   }
+  const result = {
+    ...wallet,
+    balance: newBalance.toFixed(3),
+  };
+  if (newBalance < Number(threshold)) {
+    console.error(
+      `low balance on wallet ${name} (${address}): ${result.balance}`
+    );
+    sendAlert(`:alert: Low balance on wallet ${name}`, result);
+  } else {
+    console.log(`balance on wallet ${name} (${address}): ${newBalance}`);
+  }
+  return result;
 };
 
 export const main = async () => {
@@ -102,7 +108,11 @@ export const main = async () => {
   const wallets = await sheet.getData();
 
   for (const wallet of wallets) {
-    await processWallet(wallet);
+    const result = await processWallet(wallet);
+    if (result) {
+      console.log(`updating ${result.name} to ${result.balance}`);
+      await sheet.update(wallet._row, "balance", result.balance);
+    }
   }
 
   if (process.env.HEALTHCHECK_URL) {
