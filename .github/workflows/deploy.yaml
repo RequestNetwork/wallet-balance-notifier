@@ -33,9 +33,4 @@ jobs:
           cp $(pwd)/dist/index.js function
           cp $(pwd)/package.json function
       - name: Deploy
-        run: |
-          gcloud functions deploy sync-wallet-balance \
-            --source ./function \
-            --runtime nodejs8 \
-            --trigger-topic sync-wallet-balance \
-            --entry-point main
+        run: yarn deploy:function
