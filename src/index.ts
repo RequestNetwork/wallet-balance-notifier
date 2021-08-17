@@ -79,12 +79,12 @@ export const getAlertLevel = (
   threshold: number,
   delta: number,
   currentBalance?: number
-): "error" | "warn" | null => {
+): "error" | "ok" | "skip" => {
   if (balance >= threshold) {
-    return null;
+    return "ok";
   }
   if (currentBalance && currentBalance - balance < delta) {
-    return "warn";
+    return "skip";
   }
   return "error";
 };
@@ -116,8 +116,6 @@ const processWallet = async (wallet: IWalletAlertConfig) => {
   const delta = Number(deltaStr) || 1;
   const newBalance = Number(web3Utils.fromWei(response.data.result, "ether"));
 
-  console.log({ currentBalance, newBalance, threshold, delta });
-
   const result = {
     ...wallet,
     balance: newBalance.toFixed(3),
@@ -128,13 +126,17 @@ const processWallet = async (wallet: IWalletAlertConfig) => {
     delta,
     Number(currentBalance)
   );
-  if (alertLevel) {
-    console.error(
-      `low balance on wallet ${name} (${address}): ${result.balance}`
+  if (alertLevel === "skip") {
+    console.warn(
+      `low balance on wallet ${name} (${address}): ${result.balance}. Skipping alert and balance update.`
     );
-    if (alertLevel === "error") {
-      sendAlert(`:alert: Low balance on wallet ${name}`, result);
-    }
+    return null;
+  }
+  if (alertLevel === "error") {
+    console.warn(
+      `low balance on wallet ${name} (${address}): ${result.balance}.`
+    );
+    sendAlert(`:alert: Low balance on wallet ${name}`, result);
   } else {
     console.log(`balance on wallet ${name} (${address}): ${newBalance}`);
   }
