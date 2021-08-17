@@ -27,6 +27,8 @@ jobs:
         run: | 
           yarn
           yarn build
+      - name: Test
+        run: yarn test
       - name: Prepare function 
         run: |
           mkdir function
