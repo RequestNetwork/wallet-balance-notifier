@@ -76,15 +76,27 @@ const getClient = (network: string) => {
 
 export const getAlertLevel = (
   balance: number,
-  threshold: number,
-  delta: number,
-  currentBalance?: number
+  previousBalance: number | undefined,
+  { threshold, delta }: { threshold: number; delta: number }
 ): "error" | "ok" | "skip" => {
-  if (balance >= threshold) {
+  if (balance > threshold) {
     return "ok";
   }
-  if (currentBalance && currentBalance - balance < delta) {
-    return "skip";
+
+  if (previousBalance) {
+    let nextThreshold: number | undefined = 0;
+    for (let x = threshold; x > 0; x -= delta) {
+      if (x < previousBalance) {
+        nextThreshold = x;
+        break;
+      }
+    }
+    if (!nextThreshold && previousBalance < delta) {
+      return "skip";
+    }
+    if (nextThreshold && balance > nextThreshold) {
+      return "skip";
+    }
   }
   return "error";
 };
@@ -112,19 +124,15 @@ const processWallet = async (wallet: IWalletAlertConfig) => {
     throw new Error(response.data.result);
   }
 
-  const delta = Number(deltaStr) || 1;
   const newBalance = Number(web3Utils.fromWei(response.data.result, "ether"));
-
   const result = {
     ...wallet,
     balance: newBalance.toFixed(3),
   };
-  const alertLevel = getAlertLevel(
-    newBalance,
-    Number(threshold),
-    delta,
-    Number(currentBalance)
-  );
+  const alertLevel = getAlertLevel(newBalance, Number(currentBalance), {
+    threshold: Number(threshold),
+    delta: Number(deltaStr) || 1,
+  });
   if (alertLevel === "skip") {
     console.warn(
       `low balance on wallet ${name} (${address}): ${result.balance}. Skipping alert and balance update.`
