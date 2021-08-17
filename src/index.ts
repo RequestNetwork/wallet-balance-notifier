@@ -9,6 +9,7 @@ interface IWalletAlertConfig {
   network: string;
   slackHook: string;
   balance: string;
+  delta: string;
 }
 
 const sendAlert = async (
@@ -19,6 +20,7 @@ const sendAlert = async (
     network.toLowerCase() === "rinkeby"
       ? "https://rinkeby.etherscan.io"
       : "https://etherscan.io";
+  const currency = network === "xdai" ? "xDAI" : "ETH";
   await axios.post(slackHook, {
     attachments: [
       {
@@ -31,7 +33,7 @@ const sendAlert = async (
           },
           {
             title: "Balance",
-            value: `${balance} ETH`,
+            value: `${balance} ${currency}`,
             short: true,
           },
           {
@@ -64,7 +66,14 @@ const getClient = (network: string) => {
 };
 
 const processWallet = async (wallet: IWalletAlertConfig) => {
-  const { name, address, threshold, network, balance: currentBalance } = wallet;
+  const {
+    name,
+    address,
+    threshold,
+    network,
+    balance: currentBalance,
+    delta: deltaStr,
+  } = wallet;
   const api = getClient(network);
   console.log(api.defaults.params);
   const response = await api.get("/api", {
@@ -80,12 +89,14 @@ const processWallet = async (wallet: IWalletAlertConfig) => {
     throw new Error(response.data.result);
   }
 
+  const delta = Number(deltaStr) || 1;
   const newBalance = Number(web3Utils.fromWei(response.data.result, "ether"));
   console.log({
     balance: newBalance,
     threshold,
   });
-  if (currentBalance && Number(currentBalance) === newBalance) {
+
+  if (currentBalance && Number(currentBalance) + delta > newBalance) {
     return null;
   }
   const result = {
@@ -96,7 +107,7 @@ const processWallet = async (wallet: IWalletAlertConfig) => {
     console.error(
       `low balance on wallet ${name} (${address}): ${result.balance}`
     );
-    sendAlert(`:alert: Low balance on wallet ${name}`, result);
+    // sendAlert(`:alert: Low balance on wallet ${name}`, result);
   } else {
     console.log(`balance on wallet ${name} (${address}): ${newBalance}`);
   }
