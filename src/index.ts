@@ -99,7 +99,6 @@ const processWallet = async (wallet: IWalletAlertConfig) => {
     delta: deltaStr,
   } = wallet;
   const api = getClient(network);
-  console.log(api.defaults.params);
   const response = await api.get("/api", {
     params: {
       module: "account",
