@@ -12,15 +12,30 @@ interface IWalletAlertConfig {
   delta: string;
 }
 
+const urls: Record<string, string> = {
+  rinkeby: "https://api-rinkeby.etherscan.io",
+  mainnet: "https://api.etherscan.io",
+  xdai: "https://blockscout.com/xdai/mainnet/api",
+};
+const explorerUrls: Record<string, string> = {
+  rinkeby: "https://rinkeby.etherscan.io",
+  mainnet: "https://etherscan.io",
+  xdai: "https://blockscout.com/xdai/mainnet",
+};
+
+const currencies: Record<string, string> = {
+  rinkeby: "ETH-rinkeby",
+  mainnet: "ETH",
+  xdai: "xDAI",
+};
+
 const sendAlert = async (
   text: any,
   { name, address, balance, network, slackHook }: IWalletAlertConfig
 ) => {
-  const baseUrl =
-    network.toLowerCase() === "rinkeby"
-      ? "https://rinkeby.etherscan.io"
-      : "https://etherscan.io";
-  const currency = network === "xdai" ? "xDAI" : "ETH";
+  const baseUrl = explorerUrls[network.toLowerCase()];
+  const currency = currencies[network.toLowerCase()];
+
   await axios.post(slackHook, {
     attachments: [
       {
@@ -46,12 +61,6 @@ const sendAlert = async (
       },
     ],
   });
-};
-
-const urls: Record<string, string> = {
-  rinkeby: "https://api-rinkeby.etherscan.io",
-  mainnet: "https://api.etherscan.io",
-  xdai: "https://blockscout.com/xdai/mainnet/api",
 };
 
 const getClient = (network: string) => {
@@ -91,11 +100,8 @@ const processWallet = async (wallet: IWalletAlertConfig) => {
 
   const delta = Number(deltaStr) || 1;
   const newBalance = Number(web3Utils.fromWei(response.data.result, "ether"));
-  console.log({
-    balance: newBalance,
-    threshold,
-  });
 
+  console.log({ currentBalance, newBalance, threshold, delta });
   if (currentBalance && Number(currentBalance) + delta > newBalance) {
     return null;
   }
@@ -107,7 +113,7 @@ const processWallet = async (wallet: IWalletAlertConfig) => {
     console.error(
       `low balance on wallet ${name} (${address}): ${result.balance}`
     );
-    // sendAlert(`:alert: Low balance on wallet ${name}`, result);
+    sendAlert(`:alert: Low balance on wallet ${name}`, result);
   } else {
     console.log(`balance on wallet ${name} (${address}): ${newBalance}`);
   }
