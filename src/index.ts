@@ -74,6 +74,21 @@ const getClient = (network: string) => {
   return client;
 };
 
+export const getAlertLevel = (
+  balance: number,
+  threshold: number,
+  delta: number,
+  currentBalance?: number
+): "error" | "warn" | null => {
+  if (balance >= threshold) {
+    return null;
+  }
+  if (currentBalance && currentBalance - balance < delta) {
+    return "warn";
+  }
+  return "error";
+};
+
 const processWallet = async (wallet: IWalletAlertConfig) => {
   const {
     name,
@@ -102,18 +117,24 @@ const processWallet = async (wallet: IWalletAlertConfig) => {
   const newBalance = Number(web3Utils.fromWei(response.data.result, "ether"));
 
   console.log({ currentBalance, newBalance, threshold, delta });
-  if (currentBalance && Number(currentBalance) + delta > newBalance) {
-    return null;
-  }
+
   const result = {
     ...wallet,
     balance: newBalance.toFixed(3),
   };
-  if (newBalance < Number(threshold)) {
+  const alertLevel = getAlertLevel(
+    newBalance,
+    Number(threshold),
+    delta,
+    Number(currentBalance)
+  );
+  if (alertLevel) {
     console.error(
       `low balance on wallet ${name} (${address}): ${result.balance}`
     );
-    sendAlert(`:alert: Low balance on wallet ${name}`, result);
+    if (alertLevel === "error") {
+      sendAlert(`:alert: Low balance on wallet ${name}`, result);
+    }
   } else {
     console.log(`balance on wallet ${name} (${address}): ${newBalance}`);
   }
