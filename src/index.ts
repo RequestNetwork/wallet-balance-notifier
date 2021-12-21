@@ -15,7 +15,7 @@ interface IWalletAlertConfig {
 const urls: Record<string, string> = {
   rinkeby: "https://api-rinkeby.etherscan.io",
   mainnet: "https://api.etherscan.io",
-  xdai: "https://blockscout.com/xdai/mainnet/api",
+  xdai: "https://blockscout.com/xdai/mainnet",
 };
 const explorerUrls: Record<string, string> = {
   rinkeby: "https://rinkeby.etherscan.io",
