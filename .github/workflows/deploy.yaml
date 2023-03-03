@@ -8,25 +8,27 @@ on:
 jobs:
   build-deploy:
     runs-on: ubuntu-latest
+    permissions:
+      contents: 'read'
+      id-token: 'write'
     steps:
-      - uses: actions/checkout@v2
-      - name: Use Node.js 10.x
-        uses: actions/setup-node@v1
+      - uses: actions/checkout@v3
+      - name: Use Node.js 16
+        uses: actions/setup-node@v3
         with:
-          node-version: 10.x
-      - uses: GoogleCloudPlatform/github-actions/setup-gcloud@v0.2.1
+          node-version: 16
+          cache: "yarn"
+      - uses: google-github-actions/auth@v1
         with:
-          version: '285.0.0'
-          project_id: ${{ secrets.GCP_PROJECT_ID }}
-          service_account_email: ${{ secrets.GCP_SA_EMAIL }}
-          service_account_key: ${{ secrets.GCP_SA_KEY }}
-          export_default_credentials: true
-      - name: set default project
-        run: gcloud config set core/project ${{ secrets.GCP_PROJECT_ID }}
+          workload_identity_provider: ${{ vars.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ vars.GCP_SA }}
+      - uses: google-github-actions/setup-gcloud@v1
+        with:
+          project_id: ${{ vars.GCP_PROJECT_ID }}
+      - name: Install
+        run: yarn
       - name: Build
-        run: | 
-          yarn
-          yarn build
+        run: yarn build
       - name: Test
         run: yarn test
       - name: Prepare function 
