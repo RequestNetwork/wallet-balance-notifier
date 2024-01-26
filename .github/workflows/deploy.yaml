@@ -1,6 +1,6 @@
 name: "Deploy to Google Cloud Functions"
 
-on: 
+on:
   push:
     branches:
       - master
@@ -9,8 +9,8 @@ jobs:
   build-deploy:
     runs-on: ubuntu-latest
     permissions:
-      contents: 'read'
-      id-token: 'write'
+      contents: "read"
+      id-token: "write"
     steps:
       - uses: actions/checkout@v3
       - name: Use Node.js 20
@@ -31,10 +31,5 @@ jobs:
         run: yarn build
       - name: Test
         run: yarn test
-      - name: Prepare function 
-        run: |
-          mkdir function
-          cp $(pwd)/dist/index.js function
-          cp $(pwd)/package.json function
       - name: Deploy
         run: yarn deploy:function
