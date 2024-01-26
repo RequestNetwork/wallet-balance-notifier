@@ -24,6 +24,6 @@
     "test": "jest",
     "start": "ts-node src/run.ts",
     "deploy": "yarn build && yarn deploy:function",
-    "deploy:function": "gcloud functions deploy sync-wallet-balance --entry-point main --source dist --runtime=nodejs16"
+    "deploy:function": "gcloud functions deploy sync-wallet-balance --entry-point main --source dist --runtime=nodejs20"
   }
 }
