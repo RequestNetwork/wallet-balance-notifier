@@ -104,20 +104,30 @@ const processWallet = async (wallet: IWalletAlertConfig, chains: IChainMap) => {
     chains[network].apiUrl,
     process.env[`ETHERSCAN_API_KEY_${network.toUpperCase()}`]
   );
-  const response = await api.get("/api", {
-    params: {
-      module: "account",
-      action: "balance",
-      address,
-      ...api.defaults.params,
-    },
-  });
-
-  if (response.data.status === "0") {
-    throw new Error(response.data.result);
+  let data;
+  try {
+    const response = await api.get("/api", {
+      params: {
+        module: "account",
+        action: "balance",
+        address,
+        ...api.defaults.params,
+      },
+    });
+    data = response.data;
+  } catch (e) {
+    console.error(
+      `Error fetching wallet ${wallet.name} (${address}) on ${network}:`,
+      e
+    );
+    throw e;
   }
 
-  const newBalance = Number(web3Utils.fromWei(response.data.result, "ether"));
+  if (data.status === "0") {
+    throw new Error(data.result);
+  }
+
+  const newBalance = Number(web3Utils.fromWei(data.result, "ether"));
   const result = {
     ...wallet,
     balance: newBalance.toFixed(3),
