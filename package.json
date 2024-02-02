@@ -20,8 +20,9 @@
     "typescript": "^3.8.3"
   },
   "scripts": {
-    "build:cp-package-json": "grep -v \"\\\"build\" ./package.json | tee ./build/package.json > /dev/null",
+    "build:cp-package-json": "cp package.json build/",
     "build": "rimraf build && mkdir build && yarn build:cp-package-json && tsc",
+    "gcp-build": "",
     "watch": "tsc --watch",
     "test": "jest",
     "start": "ts-node src/run.ts",
