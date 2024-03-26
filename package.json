@@ -21,6 +21,7 @@
   "scripts": {
     "build:cp-package-json": "cp package.json build/",
     "build": "rimraf build && mkdir build && pnpm build:cp-package-json && tsc",
+    "gcp-build": "",
     "watch": "tsc --watch",
     "test": "jest",
     "prettier": "prettier --write .",
