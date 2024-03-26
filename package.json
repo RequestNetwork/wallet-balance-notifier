@@ -20,13 +20,12 @@
   },
   "scripts": {
     "build:cp-package-json": "cp package.json build/",
-    "build": "rimraf build && mkdir build && yarn build:cp-package-json && tsc",
-    "gcp-build": "",
+    "build": "rimraf build && mkdir build && pnpm build:cp-package-json && tsc",
     "watch": "tsc --watch",
     "test": "jest",
     "prettier": "prettier --write .",
     "start": "ts-node src/run.ts",
-    "deploy": "yarn build && yarn deploy:function",
+    "deploy": "pnpm build && pnpm deploy:function",
     "deploy:function": "gcloud functions deploy sync-wallet-balance --entry-point main --source build --runtime=nodejs20"
   },
   "engines": {
