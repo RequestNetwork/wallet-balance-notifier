@@ -35,7 +35,3 @@ Small utility to receive slack alerts when a given EVM wallet balance is low (un
 pnpm install
 SPREADSHEET_ID=[your spreadhsheet id] ETHERSCAN_API_KEY_[NETWORK]=[your Etherscan API key] node index.js
 ```
-
-### Push new version
-
-Any commit to `main` will be automatically deployed.
