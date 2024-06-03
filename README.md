@@ -38,4 +38,4 @@ SPREADSHEET_ID=[your spreadhsheet id] ETHERSCAN_API_KEY_[NETWORK]=[your Ethersca
 
 ### Push new version
 
-Any commit to master will be automatically deployed.
+Any commit to `main` will be automatically deployed.
